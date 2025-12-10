@@ -1,3 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>The Federation - Wiki</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Rajdhani:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Inlined CSS -->
+<style>
+/* 29.css - extracted from the single-file page */
+
+/* === Base (kept your original look + added tab/editor styles) === */
+:root{--bg:#0B1E3F;--card:rgba(255,255,255,0.05);--accent:#2a3b60;--muted:#a0b0d0}
+html,body{height:100%;margin:0;font-family:'Rajdhani',sans-serif;background:var(--bg);color:#cfe0f5}
+
+/* ===== QUICK VISIBILITY FIXES =====
+   Some elements were rendering but appearing invisible due to opacity/color issues.
+   These rules force a high-contrast fallback so sidebar links, tab titles and page cards
+   are visible. If you want a subtler theme later, we can refine these styles.
+*/
+#sidebar, #content { opacity: 1 !important; display: block !important; }
+#sidebar h4, #sidebar a, #content, .content-box, .collapse-section, .collapse-header, .collapse-content {
+  color: #eaf4ff !important;
+  opacity: 1 !important;
+}
+.tabs-bar, .tabs-list, .tab-btn, .tab-title-text, .tab-btn .tab-title-text {
+  color: #eaf4ff !important;
+  opacity: 1 !important;
+}
+.tabs-bar { background: rgba(10,16,30,0.6) !important; }
+.tab-btn { border-color: rgba(255,255,255,0.08) !important; background: rgba(255,255,255,0.01) !important; }
+
+/* /END visibility fixes */
+
+#alertBanner{position:fixed;top:0;left:0;width:100%;height:40px;background:rgba(179,0,0,0.8);display:flex;align-items:center;z-index:2000}
+#scrollingText{font-family:'Audiowide',sans-serif;color:#fff;padding-left:100%;white-space:nowrap;animation:scrollLeft 15s linear infinite}
+@keyframes scrollLeft{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+
+/* Intro */
+#intro{text-align:center;padding:80px 20px}
+#emblem{width:180px;height:180px;margin:0 auto 30px;background:#1a2a4c;border:3px solid var(--accent);box-shadow:0 0 20px rgba(0,0,0,0.5);border-radius:50%}
+#intro h1{color:#f5f5f5;font-size:3em;margin:0}
+#intro h2{color:#c0cfe0;margin:5px 0 0}
+#intro h3{color:#a0b0d0;margin:10px 0 0;font-style:italic}
+#enterButton{margin-top:30px;padding:12px 24px;background:var(--accent);color:#fff;border:none;border-radius:5px;cursor:pointer}
+#enterButton:hover{background:#3b4c7a}
+
+/* Sidebar */
+#sidebar{position:fixed;top:50px;left:-260px;width:240px;bottom:0;background:#081833;padding:20px 15px;color:#c0cfe0;overflow-y:auto;opacity:0;transition:all 0.6s ease;display:none}
+#sidebar h4{margin-top:20px;margin-bottom:15px;font-size:1.1em;text-transform:uppercase;letter-spacing:1px}
+#sidebar a{color:var(--muted);text-decoration:none;display:block;margin:12px 0;font-weight:700;padding:8px 10px;border-radius:4px;opacity:0;transform:translateX(-20px);transition:all 0.25s}
+#sidebar a:hover{color:#fff;background:rgba(255,255,255,0.04);transform:translateX(0)}
+.sidebar-divider{height:1px;background:rgba(255,255,255,0.12);margin:10px 0}
+
+/* Content */
+#content{margin-left:260px;padding:25px;opacity:0;transition:opacity 0.6s;display:none}
+#breadcrumb{margin-top:20px;background:rgba(26,42,76,0.4);padding:10px 15px;border-radius:5px;font-weight:bold;color:#f5f5f5;display:inline-block;box-shadow:0 3px 6px rgba(0,0,0,0.3)}
+#breadcrumb .home{cursor:pointer;text-decoration:underline}
+
+/* Cards */
+.content-box{background:var(--card);padding:20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.2);margin-top:20px}
+.collapse-section{margin-bottom:18px;border-left:4px solid var(--accent);padding-left:12px}
+.collapse-header{cursor:pointer;background:transparent;padding:8px;border-radius:3px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.collapse-header:hover{background:rgba(255,255,255,0.02)}
+.collapse-content{display:block;padding:12px 0;animation:fadeInContent .35s}
+@keyframes fadeInContent{from{opacity:0}to{opacity:1}}
+
+/* Edit buttons & toggle */
+#editorToggle{position:fixed;top:56px;right:20px;z-index:1200;background:var(--accent);color:#fff;padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
+#editorToggle.editing{background:#8a2b2b}
+.edit-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:6px 8px;border-radius:6px;cursor:pointer;margin-left:10px}
+.edit-btn:hover{background:rgba(255,255,255,0.03);color:#fff}
+
+/* Editor Modal (updated with tabs area) */
+#editorModal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(920px,95%);max-height:85vh;background:#07122a;color:#eaf4ff;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,0.6);z-index:3000;display:none;flex-direction:column;overflow:hidden}
+#editorHeader{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent)}
+#editorTitle{font-weight:700}
+#editorToolbar{display:flex;gap:6px;padding:10px 16px;background:rgba(255,255,255,0.02);flex-wrap:wrap}
+.tool-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:6px 8px;border-radius:6px;cursor:pointer;color:#eef;text-shadow:0 1px 0 rgba(0,0,0,0.6)}
+.tool-btn:hover{background:rgba(255,255,255,0.03)}
+#editorArea{padding:12px 16px;overflow:auto;flex:1;min-height:220px;max-height:50vh;display:flex;flex-direction:column}
+#editorContent{width:100%;height:100%;outline:none;padding:8px;border-radius:6px;background:rgba(255,255,255,0.02);color:inherit}
+#editorFooter{display:flex;justify-content:flex-end;gap:8px;padding:10px 16px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.01))}
+.btn{padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
+.btn.primary{background:#2a9df4;color:#fff}
+.btn.ghost{background:transparent;color:#cfe0f5;border:1px solid rgba(255,255,255,0.04)}
+
+/* Code mode textarea (hidden by default) */
+#codeArea{width:100%;height:320px;background:#021126;color:#cfe0f5;padding:12px;border-radius:6px;border:none;display:none;font-family:monospace;font-size:13px;resize:vertical}
+
+/* Small helpers */
+.meta{font-size:0.9em;color:var(--muted)}
+.section-title{display:flex;align-items:center;gap:8px}
+.section-title h3{margin:0;font-size:1.05em}
+.small-muted{font-size:0.85em;color:var(--muted);margin-top:6px}
+
+/* === Tab UI styles === */
+.tabs-bar{display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(255,255,255,0.01);border-top:1px solid rgba(255,255,255,0.02)}
+.tabs-list{display:flex;gap:6px;align-items:center;overflow:auto;flex:1;padding-bottom:6px}
+.tab-btn{padding:6px 10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);cursor:pointer;color:#cfe0f5;display:flex;align-items:center;gap:8px}
+.tab-btn.active{background:var(--accent);color:#fff}
+.tab-edit-input{padding:4px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);color:inherit}
+
+/* tabs container (animated panes) */
+.tabs-container{position:relative;flex:1;overflow:hidden;margin-top:12px;border-top:1px solid rgba(255,255,255,0.02)}
+.tab-pane{position:absolute;inset:0;padding:12px 16px;overflow:auto;transition:transform 280ms ease, opacity 280ms ease}
+.tab-pane.entering{transform:translateX(100%);opacity:0}
+.tab-pane.entering.active{transform:translateX(0);opacity:1}
+.tab-pane.leaving{transform:translateX(0);opacity:1}
+.tab-pane.leaving.left{transform:translateX(-30%);opacity:0}
+.tab-pane.leaving.right{transform:translateX(30%);opacity:0}
+
+/* section editor list inside pane */
+.section-editor{background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02);padding:10px;border-radius:8px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
+.section-editor .controls{display:flex;gap:8px;align-items:center}
+.section-title-input{padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+.editor-body{padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.02);min-height:80px;background:rgba(0,0,0,0.15);overflow:auto;color:inherit}
+.small{font-size:0.85em;color:var(--muted)}
+.move-select{padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+
+/* responsive tweaks */
+@media (max-width:640px){
+  #editorModal{width:100%;height:100%;border-radius:0;top:50%;transform:translate(-50%,-50%);} 
+  .tabs-container{margin-top:8px}
+}
+</style>
+
+</head>
+<body>
+
+<!-- Alert banner -->
+<div id="alertBanner"><div id="scrollingText">⚠️ UNSTABLE WEBSITE – DDOS ATTACK IN PROGRESS ⚠️</div></div>
+
+<!-- Editor toggle -->
+<button id="editorToggle" title="Toggle editing (saved)">Enable Editing</button>
+
+<!-- Loading overlay -->
+<div id="loadingOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;z-index:1500">
+  <div style="text-align:center;color:#fff">Loading...</div>
+</div>
+
+<!-- Intro -->
+<div id="intro">
+  <div id="emblem"></div>
+  <h1>THE FEDERATION</h1>
+  <h2>The Stellar Federal Directorate</h2>
+  <h3>“One Voice. One Vision. One Federation.”</h3>
+  <button id="enterButton" onclick="enterDatabase()">Enter Federation Database</button>
+</div>
+
+<!-- Sidebar (generated) -->
+<div id="sidebar"></div>
+
+<!-- Content -->
+<div id="content"></div>
+
+<!-- EDITOR MODAL (UPDATED: tabs + section list + WYSIWYG) -->
+<div id="editorModal" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+  <div id="editorHeader">
+    <div style="display:flex;flex-direction:column">
+      <div id="editorTitle">Edit Page</div>
+      <div class="meta" id="editorMeta" style="font-size:12px;margin-top:4px"></div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="btn ghost" id="editorCloseBtn">Close</button>
+    </div>
+  </div>
+
+  <div id="editorToolbar">
+    <!-- Full toolbar (uses execCommand) -->
+    <button class="tool-btn" data-cmd="bold"><b>B</b></button>
+    <button class="tool-btn" data-cmd="italic"><i>I</i></button>
+    <button class="tool-btn" data-cmd="underline"><u>U</u></button>
+    <button class="tool-btn" data-cmd="strikeThrough"><s>S</s></button>
+
+    <button class="tool-btn" data-cmd="formatBlock" data-value="H1">H1</button>
+    <button class="tool-btn" data-cmd="formatBlock" data-value="H2">H2</button>
+    <button class="tool-btn" data-cmd="formatBlock" data-value="H3">H3</button>
+
+    <button class="tool-btn" data-cmd="insertUnorderedList">• List</button>
+    <button class="tool-btn" data-cmd="insertOrderedList">1. List</button>
+
+    <button class="tool-btn" id="createLinkBtn" data-cmd="createLink">Link</button>
+    <button class="tool-btn" data-cmd="removeFormat">Clear</button>
+
+    <button class="tool-btn" data-cmd="undo">Undo</button>
+    <button class="tool-btn" data-cmd="redo">Redo</button>
+
+    <button class="tool-btn" id="codeModeBtn" title="Toggle code (HTML) view">Code</button>
+
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <input id="newTabTitle" placeholder="New tab title" style="padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit" />
+      <button class="btn" id="addTabBtn">+ Tab</button>
+      <button class="btn primary" id="editorSaveBtn">Save Page</button>
+    </div>
+  </div>
+
+  <div class="tabs-bar" id="tabsBar">
+    <!-- tabs list injected here -->
+  </div>
+
+  <div class="tabs-container" id="tabsContainer">
+    <!-- tab panes injected here -->
+  </div>
+
+  <div id="editorArea" style="display:none">
+    <div id="editorContent" contenteditable="true" spellcheck="true"></div>
+    <textarea id="codeArea" spellcheck="false"></textarea>
+  </div>
+
+  <div id="editorFooter">
+    <div style="margin-right:auto" class="small-muted">Tip: Manage tabs at top. Edit section content below the list.</div>
+    <button class="btn ghost" id="editorRevertBtn">Revert Section</button>
+    <button class="btn ghost" id="editorCloseNoSaveBtn">Close w/o Save</button>
+    <button class="btn primary" id="editorSaveAndCloseBtn">Save & Close</button>
+  </div>
+</div>
+
+<!-- Inlined JS (29.js) -->
+<script>
 /* 29.js - extracted from single-file page (deferred) */
 
 /* ===========================
@@ -60,7 +283,6 @@ function loadPagesFromStorage(){
     const raw = localStorage.getItem(STORAGE_KEY);
     if(!raw) return JSON.parse(JSON.stringify(DEFAULT_PAGES));
     const parsed = JSON.parse(raw);
-    // Validate shape: expect an object mapping pageId -> pageObj
     if(!parsed || typeof parsed !== 'object' || Array.isArray(parsed)){
       console.warn('Invalid pages data in localStorage, falling back to defaults');
       return JSON.parse(JSON.stringify(DEFAULT_PAGES));
@@ -94,7 +316,6 @@ let editMode = (localStorage.getItem(EDITMODE_KEY) === 'true');
 const sidebarEl = document.getElementById('sidebar');
 const contentEl = document.getElementById('content');
 const editorToggleBtn = document.getElementById('editorToggle');
-// Defensive: ensure required elements exist before wiring events
 if(!sidebarEl) console.warn('Warning: #sidebar element not found');
 if(!contentEl) console.warn('Warning: #content element not found');
 if(!editorToggleBtn) console.warn('Warning: #editorToggle element not found');
@@ -173,7 +394,6 @@ function buildSidebar(){
       // attach a direct click handler to avoid delegation edge-cases
       a.addEventListener('click', (e)=>{
         e.preventDefault();
-        // defensive: ensure the page exists before loading
         if(PAGES && PAGES[item.id]){
           loadPage(item.id);
         } else {
@@ -214,12 +434,8 @@ function loadPage(pageId){
     console.warn('loadPage: requested page not found:', pageId);
     return;
   }
-  // ensure tabs array exists
   const tabs = Array.isArray(page.tabs) ? page.tabs : [];
-  if(tabs.length === 0){
-    console.warn('loadPage: page has no tabs:', pageId);
-  }
-  // ensure activeTab exists (defensive)
+  if(tabs.length === 0) console.warn('loadPage: page has no tabs:', pageId);
   const activeTab = (tabs.find(t => t.id === page.activeTabId) || tabs[0] || { sections: [] });
 
   const breadcrumb = `<div id="breadcrumb"><span class="home" onclick="returnHome()">Home</span> &nbsp; &gt; &nbsp; <span id="sectionHierarchy">${escapeHtml(page.category)} > ${escapeHtml(page.title)}</span></div>`;
@@ -843,32 +1059,23 @@ function init(){
   },200);
 }
 
-
 document.addEventListener('DOMContentLoaded', init);
 
-// Defensive: guard optional controls that may not exist in all builds
+/* Speaker toggle (kept simple) */
+let musicPlaying = true;
 const speakerBtnEl = document.getElementById('speakerBtn');
 if(speakerBtnEl){
   speakerBtnEl.addEventListener('click', ()=>{
     const m = document.getElementById('bgMusic');
     musicPlaying = !musicPlaying;
-    if(m && typeof m.play === 'function') {
+    if(m && typeof m.play === 'function'){
       if(musicPlaying) m.play(); else m.pause();
     }
   });
 } else {
-  // if no speaker button, ensure bgMusic won't cause errors when toggled elsewhere
   const m = document.getElementById('bgMusic');
   if(m && typeof m.pause === 'function') m.pause();
 }
-
-/* Speaker toggle (kept simple) */
-let musicPlaying = true;
-document.getElementById('speakerBtn').addEventListener('click', ()=>{
-  const m = document.getElementById('bgMusic');
-  musicPlaying = !musicPlaying;
-  if(musicPlaying) m.play(); else m.pause();
-});
 
 /* Developer helper (addPage) retained and adjusted */
 window.addPage = function(id, pageObj){
@@ -881,7 +1088,7 @@ window.addPage = function(id, pageObj){
   attachSidebarDelegation();
 };
 
-// Debug helpers: expose current pages and reset
+// Debug helpers
 window.dumpPages = function(){ console.log('PAGES:', PAGES); return PAGES; };
 window.resetPagesToDefaults = function(){
   if(confirm && !confirm('Reset stored pages to defaults?')) return;
@@ -891,3 +1098,7 @@ window.resetPagesToDefaults = function(){
   attachSidebarDelegation();
   console.log('Pages reset to defaults');
 };
+</script>
+
+</body>
+</html>
