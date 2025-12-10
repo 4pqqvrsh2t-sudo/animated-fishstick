@@ -5,11 +5,11 @@
    =========================== */
 const DEFAULT_PAGES = {
   Founding: {
-    category: "Executive",
-    title: "Office of Central Command",
+    category: "Foundation",
+    title: "Executive Branches",
     // legacy 'sections' will be migrated to tabs automatically on init
     sections: [
-      { header: "Founding Doctrine", content: "<p>Placeholder text for the Federation’s founding history and core ideology.</p>" }
+      { header: "Founding Doctrine (OCC)", content: "<p>The Office of Central Command stands as the guiding force of the Federation, its authority forged at the dawn of interstellar unification. Charged with maintaining cohesion among distant colonies and ensuring the Federation’s vision endures, the Office is both a council of leadership and a sentinel of ideology.Its founders envisioned a structure where governance and duty are inseparable—every decision reverberates across light-years, shaping the lives of countless citizens. The doctrines emphasize unity, accountability, and vigilance, forming the backbone of the Federation’s enduring order.</p>" }
     ]
   },
   Stability: {
