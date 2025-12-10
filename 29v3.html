@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>The Federation - Wiki (Editable)</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Rajdhani:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Split CSS -->
+<link rel="stylesheet" href="29.css">
+
+<!-- Defer JS so it runs after parsing -->
+<script src="29.js" defer></script>
+</head>
+<body>
+
+<!-- Alert banner -->
+<div id="alertBanner"><div id="scrollingText">⚠️ UNSTABLE WEBSITE – DDOS ATTACK IN PROGRESS ⚠️</div></div>
+
+<!-- Music & speaker (kept) -->
+<audio id="bgMusic" src="federation_theme.mp3" loop autoplay></audio>
+<div id="speakerBtn" style="position:fixed;bottom:15px;right:15px;z-index:1200;width:48px;height:48px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer">
+  <svg id="speakerIcon" viewBox="0 0 24 24" width="20" height="20"><path d="M3 9v6h4l5 5V4L7 9H3z" fill="#fff"/></svg>
+</div>
+
+<!-- Editor toggle -->
+<button id="editorToggle" title="Toggle editing (saved)">Enable Editing</button>
+
+<!-- Loading overlay -->
+<div id="loadingOverlay" style="position:absolute;top:0;left:0;width:100%;height:100%;display:none;align-items:center;justify-content:center;z-index:1500">
+  <div style="text-align:center;color:#fff">Loading...</div>
+</div>
+
+<!-- Intro -->
+<div id="intro">
+  <div id="emblem"></div>
+  <h1>THE FEDERATION</h1>
+  <h2>The Stellar Federal Directorate</h2>
+  <h3>“One Voice. One Vision. One Federation.”</h3>
+  <button id="enterButton" onclick="enterDatabase()">Enter Federation Database</button>
+</div>
+
+<!-- Sidebar (generated) -->
+<div id="sidebar"></div>
+
+<!-- Content -->
+<div id="content"></div>
+
+<!-- EDITOR MODAL (UPDATED: tabs + section list + WYSIWYG) -->
+<div id="editorModal" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+  <div id="editorHeader">
+    <div style="display:flex;flex-direction:column">
+      <div id="editorTitle">Edit Page</div>
+      <div class="meta" id="editorMeta" style="font-size:12px;margin-top:4px"></div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="btn ghost" id="editorCloseBtn">Close</button>
+    </div>
+  </div>
+
+  <div id="editorToolbar">
+    <!-- Full toolbar (uses execCommand) -->
+    <button class="tool-btn" data-cmd="bold"><b>B</b></button>
+    <button class="tool-btn" data-cmd="italic"><i>I</i></button>
+    <button class="tool-btn" data-cmd="underline"><u>U</u></button>
+    <button class="tool-btn" data-cmd="strikeThrough"><s>S</s></button>
+
+    <button class="tool-btn" data-cmd="formatBlock" data-value="H1">H1</button>
+    <button class="tool-btn" data-cmd="formatBlock" data-value="H2">H2</button>
+    <button class="tool-btn" data-cmd="formatBlock" data-value="H3">H3</button>
+
+    <button class="tool-btn" data-cmd="insertUnorderedList">• List</button>
+    <button class="tool-btn" data-cmd="insertOrderedList">1. List</button>
+
+    <button class="tool-btn" id="createLinkBtn" data-cmd="createLink">Link</button>
+    <button class="tool-btn" data-cmd="removeFormat">Clear</button>
+
+    <button class="tool-btn" data-cmd="undo">Undo</button>
+    <button class="tool-btn" data-cmd="redo">Redo</button>
+
+    <button class="tool-btn" id="codeModeBtn" title="Toggle code (HTML) view">Code</button>
+
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <input id="newTabTitle" placeholder="New tab title" style="padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit" />
+      <button class="btn" id="addTabBtn">+ Tab</button>
+      <button class="btn primary" id="editorSaveBtn">Save Page</button>
+    </div>
+  </div>
+
+  <div class="tabs-bar" id="tabsBar">
+    <!-- tabs list injected here -->
+  </div>
+
+  <div class="tabs-container" id="tabsContainer">
+    <!-- tab panes injected here -->
+  </div>
+
+  <div id="editorArea" style="display:none">
+    <div id="editorContent" contenteditable="true" spellcheck="true"></div>
+    <textarea id="codeArea" spellcheck="false"></textarea>
+  </div>
+
+  <div id="editorFooter">
+    <div style="margin-right:auto" class="small-muted">Tip: Manage tabs at top. Edit section content below the list.</div>
+    <button class="btn ghost" id="editorRevertBtn">Revert Section</button>
+    <button class="btn ghost" id="editorCloseNoSaveBtn">Close w/o Save</button>
+    <button class="btn primary" id="editorSaveAndCloseBtn">Save & Close</button>
+  </div>
+</div>
+
+</body>
+</html>
