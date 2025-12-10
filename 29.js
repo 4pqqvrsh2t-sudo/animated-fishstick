@@ -9,9 +9,12 @@ const DEFAULT_PAGES = {
     title: "Executive Branches",
     // legacy 'sections' will be migrated to tabs automatically on init
     sections: [
-      { header: "Founding Doctrine (OCC)", content: "<p>The Office of Central Command stands as the guiding force of the Federation, its authority forged at the dawn of interstellar unification. Charged with maintaining cohesion among distant colonies and ensuring the Federation’s vision endures, the Office is both a council of leadership and a sentinel of ideology.Its founders envisioned a structure where governance and duty are inseparable—every decision reverberates across light-years, shaping the lives of countless citizens. The doctrines emphasize unity, accountability, and vigilance, forming the backbone of the Federation’s enduring order.</p>" }
+      { header: "Founding Doctrine (OCC)", content: "<p>The Office of Central Command stands as the guiding force of the Federation, its authority forged at the dawn of interstellar unification. Charged with maintaining cohesion among distant colonies and ensuring the Federation’s vision endures, the Office is both a council of leadership and a sentinel of ideology.Its founders envisioned a structure where governance and duty are inseparable—every decision reverberates across light-years, shaping the lives of countless citizens. The doctrines emphasize unity, accountability, and vigilance, forming the backbone of the Federation’s enduring order.</p>" },
+      { header: "Council of Directives", content: "<p>At the core of the Office lies the Council of Directives, an assembly of the most senior and trusted leaders. They deliberate on matters of law, strategy, and expansion, balancing the needs of individual colonies with the overarching mission of the Federation. Their judgments are swift yet deliberate, ensuring that no decision undermines the collective security or prosperity of the stellar body.</p>" },
+      { header: "Symbol of Authority", content: "<p>Every colony recognizes the seal of the Central Command: a circular emblem symbolizing unity and vigilance. It is displayed prominently on all official documents, vessels, and stations, serving as both a mark of leadership and a reminder that every action—from administrative tasks to fleet deployment—falls under the watchful eye of the Federation’s Executive.</p>" },
     ]
   },
+ 
   Stability: {
     category: "Control & Security",
     title: "Ministry of Stability & Compliance",
