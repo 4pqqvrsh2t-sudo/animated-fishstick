@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The Federation - Wiki</title>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Rajdhani:wght@400;700&display=swap" rel="stylesheet">
+<style>
+
+      /* Subtle noise background */
+  body::before {
+    content: "";
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background-image: 
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 4px),
+      repeating-linear-gradient(-45deg, rgba(255,255,255,0.01) 0 1px, transparent 1px 4px);
+    pointer-events:none; z-index:0;
+  }
+    
+  :root{
+    --bg:#071329; --card:rgba(255,255,255,0.04); --accent:#2a3b60; --muted:#9fb0cf;
+    --glass: rgba(255,255,255,0.03);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);color:#dbeefc;font-family:'Rajdhani',sans-serif}
+  a{color:inherit}
+    
+ /* Alert banner */
+#alertBanner {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:40px;
+  background:rgba(179,0,0,0.9);
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  z-index:2000;
+  font-family:'Audiowide',sans-serif;
+
+}
+
+#scrollingText {
+  color:#fff;
+  white-space:nowrap;
+  padding-left:100%;
+  animation:scrollLeft 12s linear infinite;
+}
+
+@keyframes scrollLeft {
+  0%   { transform:translateX(100%); }
+  100% { transform:translateX(-100%); }
+}
+
+@keyframes hideBanner {
+  0% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  #alertBanner {
+    height: 32px;
+  }
+
+  #scrollingText {
+    font-size: 0.85rem;
+    animation-duration: 6s;
+  }
+}
+
+  /* Loading overlay */
+  #loadingOverlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(2,6,15,0.6), rgba(2,6,15,0.9));z-index:2100}
+  #loadingOverlay .box{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,0.6);min-width:220px;text-align:center}
+    
+ /* Intro */
+#intro{text-align:center;padding:80px 20px}
+#emblem{width:180px;height:180px;margin:0 auto 30px;background:#1a2a4c;border:3px solid var(--accent);box-shadow:0 0 20px rgba(0,0,0,0.5);border-radius:50%}
+#intro h1{color:#f5f5f5;font-size:3em;margin:0;font-family:'Audiowide',sans-serif}
+#intro h2{color:#c0cfe0;margin:5px 0 0}
+#intro h3{color:#a0b0d0;margin:10px 0 0;font-style:italic}
+#enterButton{margin-top:30px;padding:12px 24px;background:var(--accent);color:#fff;border:none;border-radius:5px;cursor:pointer}
+#enterButton:hover{background:#3b4c7a}
+    
+  /* Layout */
+  #app{display:flex;min-height:100vh}
+  #sidebar{width:260px;background:#081733;padding:18px;overflow:auto;transform:translateX(-280px);transition:transform .45s ease,opacity .45s;opacity:0;z-index:50}
+  #sidebar.visible{transform:translateX(0);opacity:1}
+  #sidebar h4{color:#cfe6ff;margin:14px 0 8px;font-size:.9rem;letter-spacing:.6px}
+  #sidebar a.page-link{display:block;padding:8px 10px;border-radius:6px;text-decoration:none;color:var(--muted);font-weight:700;margin:6px 0}
+  #sidebar a.page-link:hover{background:var(--glass);color:#fff}
+  #content{flex:1;padding:28px;opacity:0;transition:opacity .45s}
+  #content.visible{opacity:1}
+  #breadcrumb{display:inline-block;padding:8px 12px;border-radius:8px;background:linear-gradient(90deg, rgba(255,255,255,0.01), transparent);box-shadow:0 6px 16px rgba(0,0,0,0.35);font-weight:700}
+  .content-box{background:var(--card);padding:16px;border-radius:10px;margin-top:18px;box-shadow:0 8px 24px rgba(0,0,0,0.45)}
+  .collapse-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:6px;border-radius:6px}
+  .collapse-header:hover{background:rgba(255,255,255,0.02)}
+  .collapse-content{padding:10px 2px}
+  .edit-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:6px 8px;border-radius:6px;cursor:pointer}
+    
+  /* Editor toggle */
+  #editorToggle{position:fixed;top:48px;right:18px;z-index:2000;padding:8px 12px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer}
+  #editorToggle.editing{background:#8a2b2b}
+    
+  /* Editor modal */
+  #editorModal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(980px,96%);max-height:86vh;background:#061226;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.6);z-index:3000;display:none;flex-direction:column;overflow:hidden}
+  #editorHeader{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.02)}
+  #editorToolbar{display:flex;gap:8px;padding:10px 14px;flex-wrap:wrap;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent)}
+  .tool-btn{padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:transparent;cursor:pointer}
+  #tabsBar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-top:1px solid rgba(255,255,255,0.02);overflow:auto;background:transparent}
+  .tabs-list{display:flex;gap:8px;align-items:center}
+  .tab-btn{padding:6px 10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);cursor:pointer;display:flex;align-items:center;gap:8px}
+  .tab-btn.active{background:var(--accent);color:#fff;border-color:rgba(255,255,255,0.06)}
+  .tab-edit-input{padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.06)}
+  .tabs-container{position:relative;min-height:160px;max-height:40vh;overflow:hidden;padding:12px 14px}
+  .tab-pane{position:absolute;inset:0;padding:6px 6px;overflow:auto;transition:transform .28s ease,opacity .28s ease}
+  .tab-pane.entering{transform:translateX(100%);opacity:0}
+  .tab-pane.entering.active{transform:translateX(0);opacity:1}
+  .tab-pane.leaving.left{transform:translateX(-30%);opacity:0}
+  .tab-pane.leaving.right{transform:translateX(30%);opacity:0}
+  .tab-pane.active{transform:translateX(0);opacity:1}
+  .section-editor{background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02);padding:10px;border-radius:8px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
+  .editor-body{padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.02);min-height:70px;background:rgba(0,0,0,0.15);overflow:auto}
+  #editorArea{padding:12px 14px;border-top:1px solid rgba(255,255,255,0.02);display:none;flex-direction:column;gap:8px}
+  #editorContent{width:100%;min-height:120px;outline:none;padding:8px;border-radius:6px;background:rgba(255,255,255,0.02);color:inherit}
+  #codeArea{width:100%;min-height:160px;background:#021126;color:#cfe0f5;padding:12px;border-radius:6px;border:none;display:none;font-family:monospace}
+  #editorFooter{display:flex;justify-content:flex-end;gap:8px;padding:10px 14px;border-top:1px solid rgba(255,255,255,0.02)}
+  .btn{padding:8px 12px;border-radius:8px;border:none;cursor:pointer}
+  .btn.primary{background:#2a9df4;color:#fff}
+  .btn.ghost{background:transparent;color:#cfe0f5;border:1px solid rgba(255,255,255,0.04)}
+  /* small */
+  .meta{font-size:.85rem;color:var(--muted)}
+  /* responsive */
+  @media (max-width:720px){
+    #sidebar{position:fixed;left:0;top:0;height:100%;transform:translateX(-110%)} 
+    #sidebar.visible{transform:translateX(0)}
+    #editorModal{width:100%;height:100%;border-radius:0}
+  }
+</style>
+</head>
+<body>
+
+  <!-- Alert banner (hidden while loading overlay active) -->
+  <div id="alertBanner">
+  <div id="scrollingText">⚠️ UNSTABLE WEBSITE – DDOS ATTACK IN PROGRESS ⚠️</div>
+</div>
+
+  <!-- Loading overlay -->
+  <div id="loadingOverlay" aria-hidden="true">
+    <div class="box"><div id="loadingText">Loading…</div></div>
+  </div>
+
+  <!-- Editor toggle -->
+  <button id="editorToggle" title="Toggle editing (saved)">Enable Editing</button>
+
+  <!-- Editor Modal (new version) -->
+  <div id="editorModal" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+    <div id="editorHeader">
+      <div>
+        <div id="editorTitle" style="font-weight:700">Edit Page</div>
+        <div class="meta" id="editorMeta"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn ghost" id="editorCloseBtn">Close</button>
+      </div>
+    </div>
+
+    <div id="editorToolbar" aria-hidden="false">
+      <button class="tool-btn" data-cmd="bold"><b>B</b></button>
+      <button class="tool-btn" data-cmd="italic"><i>I</i></button>
+      <button class="tool-btn" data-cmd="underline"><u>U</u></button>
+      <button class="tool-btn" data-cmd="insertUnorderedList">• List</button>
+      <button class="tool-btn" data-cmd="insertOrderedList">1. List</button>
+      <button class="tool-btn" id="createLinkBtn" data-cmd="createLink">Link</button>
+      <button class="tool-btn" id="codeModeBtn">Code</button>
+
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <input id="newTabTitle" placeholder="New tab title" style="padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:inherit" />
+        <button class="btn" id="addTabBtn">+ Tab</button>
+        <button class="btn primary" id="editorSaveBtn">Save Page</button>
+      </div>
+    </div>
+
+    <div id="tabsBar"><div class="tabs-list" id="tabsList"></div></div>
+    <div class="tabs-container" id="tabsContainer"></div>
+
+    <div id="editorArea">
+      <div id="editorContent" contenteditable="true" spellcheck="true"></div>
+      <textarea id="codeArea" spellcheck="false"></textarea>
+    </div>
+
+    <div id="editorFooter">
+      <div style="margin-right:auto" class="meta">Tip: Manage tabs above. Edit section content below the list.</div>
+      <button class="btn ghost" id="editorRevertBtn">Revert Section</button>
+      <button class="btn ghost" id="editorCloseNoSaveBtn">Close w/o Save</button>
+      <button class="btn primary" id="editorSaveAndCloseBtn">Save & Close</button>
+    </div>
+  </div>
+
+  <!-- Intro + App -->
+  <div id="intro">
+    <div id="emblem" aria-hidden="true"></div>
+    <h1>THE FEDERATION</h1>
+    <h2>The Stellar Federal Directorate</h2>
+    <p style="color:var(--muted);margin-top:6px;font-style:italic">“One Voice. One Vision. One Federation.”</p>
+    <button id="enterButton">Enter Federation Database</button>
+  </div>
+
+  <div id="app" aria-hidden="false">
+    <!-- Sidebar -->
+    <aside id="sidebar" aria-label="Pages sidebar"></aside>
+
+    <!-- Main content -->
+    <main id="content"></main>
+  </div>
+
+<script>
+
+/* -----------------------
+   Data & Storage
+   ------------------------*/
+const DEFAULT_PAGES = {
+  Founding: {
+    category: "Executive Branches",
+    title: "Founding Doctrine",
+    sections: [
+      { header: "Office of Central Command (OCC)", content: "<p>The Office of Central Command stands as the guiding force of the Federation, its authority forged at the dawn of interstellar unification. Charged with maintaining cohesion among distant colonies and ensuring the Federation’s vision endures, the Office is both a council of leadership and a sentinel of ideology.Its founders envisioned a structure where governance and duty are inseparable—every decision reverberates across light-years, shaping the lives of countless citizens. The doctrines emphasize unity, accountability, and vigilance, forming the backbone of the Federation’s enduring order.</p>" }, 
+      { header: "Council of Directives", content: "<p>At the core of the Office lies the Council of Directives, an assembly of the most senior and trusted leaders. They deliberate on matters of law, strategy, and expansion, balancing the needs of individual colonies with the overarching mission of the Federation. Their judgments are swift yet deliberate, ensuring that no decision undermines the collective security or prosperity of the stellar body.</p>" },
+        
+      { header: "Symbol of Authority", content: "<p>Every colony recognizes the seal of the Central Command: a circular emblem symbolizing unity and vigilance. It is displayed prominently on all official documents, vessels, and stations, serving as both a mark of leadership and a reminder that every action—from administrative tasks to fleet deployment—falls under the watchful eye of the Federation’s Executive.</p>" }
+    ]
+  },
+  Stability: { category: "Control & Security", title: "Ministry of Stability & Compliance", sections: [{ header: "Compliance Protocols", content:"<p>Internal compliance measures and social order enforcement.</p>" }] },
+  Security: { category: "Control & Security", title: "Department of Interstellar Security", sections: [{ header: "Security Mandates", content:"<p>Intelligence and surveillance operations.</p>" }] },
+  Defense: { category: "Control & Security", title: "Defense Directorate", sections: [{ header: "Fleet Command", content:"<p>Fleet deployment and planetary defense.</p>" }] },
+  Colonies: { category: "Expansion", title: "Bureau of Colonies", sections: [{ header: "Colonial Oversight", content:"<p>Management of colonies and resources.</p>" }] },
+  Relations: { category: "Expansion", title: "External Relations Authority", sections: [{ header: "Diplomatic Affairs", content:"<p>Diplomacy, trade, and foreign policy.</p>" }] }
+};
+
+const STORAGE_KEY = 'wiki_federation_data_v2';
+const EDITMODE_KEY = 'wiki_federation_editmode_v2';
+
+function safeParse(raw, fallback){ try{ return JSON.parse(raw); }catch(e){ return fallback; } }
+
+function loadPagesFromStorage(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) return deepClone(DEFAULT_PAGES);
+  const parsed = safeParse(raw, null);
+  if(!parsed || typeof parsed !== 'object') return deepClone(DEFAULT_PAGES);
+  return parsed;
+}
+function savePagesToStorage(pages){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(pages)); }catch(e){ console.error('save failed', e); }
+}
+function deepClone(v){ return JSON.parse(JSON.stringify(v)); }
+
+/* -----------------------
+   Small helpers
+   ------------------------*/
+const $ = (s, r=document)=> r.querySelector(s);
+const $$ = (s, r=document)=> Array.from((r||document).querySelectorAll(s));
+const makeId = (p='id') => `${p}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}`;
+function escapeHtml(str){ return String(str||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* -----------------------
+   App state & elements
+   ------------------------*/
+let PAGES = loadPagesFromStorage();
+let currentPageId = null;
+let editMode = (localStorage.getItem(EDITMODE_KEY) === 'true');
+const sidebarEl = $('#sidebar'), contentEl = $('#content'), editorToggleBtn = $('#editorToggle');
+const enterButton = $('#enterButton'), intro = $('#intro');
+const loadingOverlay = $('#loadingOverlay'), alertBanner = $('#alertBanner');
+
+/* Editor */
+const editorModal = $('#editorModal'), editorTitle = $('#editorTitle'), editorMeta = $('#editorMeta');
+const tabsListEl = $('#tabsList'), tabsBar = $('#tabsBar'), tabsContainer = $('#tabsContainer');
+const editorArea = $('#editorArea'), editorContent = $('#editorContent'), codeArea = $('#codeArea');
+const editorSaveBtn = $('#editorSaveBtn'), editorSaveAndCloseBtn = $('#editorSaveAndCloseBtn'), editorCloseBtn = $('#editorCloseBtn');
+const editorCloseNoSaveBtn = $('#editorCloseNoSaveBtn'), editorRevertBtn = $('#editorRevertBtn');
+const addTabBtn = $('#addTabBtn'), newTabTitleInput = $('#newTabTitle'), codeModeBtn = $('#codeModeBtn');
+
+let editorState = null; // { pageId, pageCopy, currentTabId, currentSectionId, originalSectionHtml }
+let codeMode = false;
+
+/* -----------------------
+   Migration: convert legacy 'sections' to tabs[] shape
+   ------------------------*/
+function migratePagesShape(pages){
+  let changed = false;
+  for(const key of Object.keys(pages)){
+    const p = pages[key];
+    if(!p) continue;
+    if(Array.isArray(p.tabs)){
+      // ensure ids
+      p.tabs.forEach(t=>{
+        t.id = t.id || makeId('t');
+        t.title = t.title || 'Untitled';
+        t.sections = Array.isArray(t.sections) ? t.sections : [];
+        t.sections.forEach(s=>{
+          s.id = s.id || makeId('s');
+          s.header = s.header || s.title || 'Untitled';
+          s.content = s.content || s.html || '';
+          if(typeof s.collapsed === 'undefined') s.collapsed = false;
+        });
+      });
+      p.activeTabId = p.activeTabId || (p.tabs[0] && p.tabs[0].id) || null;
+      continue;
+    }
+    // legacy 'sections' -> create a single tab
+    if(Array.isArray(p.sections)){
+      const tab = { id: makeId('t'), title: 'Main', sections: p.sections.map(s=>({
+        id: makeId('s'), header: s.header || s.title || 'Untitled', content: s.content || s.html || '', collapsed:false
+      }))};
+      p.tabs = [tab];
+      p.activeTabId = tab.id;
+      delete p.sections;
+      changed = true;
+    } else {
+      // empty page -> create empty tab
+      p.tabs = [{ id: makeId('t'), title: 'Main', sections: [] }];
+      p.activeTabId = p.tabs[0].id;
+      changed = true;
+    }
+  }
+  if(changed) savePagesToStorage(pages);
+}
+
+/* -----------------------
+   Sidebar & rendering
+   ------------------------*/
+function buildSidebar(){
+  const categories = {};
+  for(const id of Object.keys(PAGES)){
+    const p = PAGES[id];
+    const cat = p.category || 'Uncategorized';
+    categories[cat] = categories[cat] || [];
+    categories[cat].push({ id, title: p.title || id });
+  }
+  sidebarEl.innerHTML = '';
+  for(const cat of Object.keys(categories)){
+    const h = document.createElement('h4'); h.textContent = cat; sidebarEl.appendChild(h);
+    categories[cat].forEach(item=>{
+      const a = document.createElement('a');
+      a.className = 'page-link';
+      a.href = '#'+item.id;
+      a.dataset.pageId = item.id;
+      a.innerHTML = escapeHtml(item.title);
+      sidebarEl.appendChild(a);
+    });
+    const div = document.createElement('div'); div.style.height='10px'; sidebarEl.appendChild(div);
+  }
+}
+
+/* Delegated click for sidebar */
+function attachSidebarDelegation(){
+  if(sidebarEl.__installed) return;
+  sidebarEl.__installed = true;
+  sidebarEl.addEventListener('click', (e)=>{
+    const a = e.target.closest('a.page-link');
+    if(!a) return;
+    e.preventDefault();
+    const id = a.dataset.pageId || a.getAttribute('href').replace(/^#/,'');
+    if(!id) return;
+    if(PAGES[id]) loadPage(id);
+  });
+}
+
+/* Load & render a page */
+function loadPage(pageId){
+  if(!PAGES[pageId]) { console.warn('no page', pageId); return; }
+  currentPageId = pageId;
+  const page = PAGES[pageId];
+  const tabs = Array.isArray(page.tabs) ? page.tabs : [];
+  const activeTab = tabs.find(t=>t.id === page.activeTabId) || tabs[0] || {sections:[]};
+  page.activeTabId = activeTab.id || (tabs[0] && tabs[0].id) || null;
+
+  const breadcrumb = `<div id="breadcrumb"><span style="cursor:pointer" id="homeLink">Home</span> &nbsp; &gt; &nbsp; ${escapeHtml(page.category)} &nbsp; &gt; &nbsp; ${escapeHtml(page.title)}</div>`;
+  let html = '';
+  (activeTab.sections || []).forEach(sec=>{
+    const hdr = sec.header || sec.title || 'Untitled';
+    html += `<div class="content-box">
+      <div class="collapse-section">
+        <div class="collapse-header" data-section-id="${sec.id}">
+          <div><h3 style="margin:0">${escapeHtml(hdr)}</h3></div>
+          <div>${ editMode ? `<button class="edit-btn" data-edit-page="${pageId}" data-edit-tab="${activeTab.id}" data-edit-section="${sec.id}">Edit</button>` : '' }</div>
+        </div>
+        <div class="collapse-content" id="section_${sec.id}">${sec.content || ''}</div>
+      </div>
+    </div>`;
+  });
+  contentEl.innerHTML = breadcrumb + html;
+  // home link
+  $('#homeLink').addEventListener('click', ()=> returnHome());
+  // collapse behavior
+  $$('.collapse-header').forEach(h=>{
+    h.addEventListener('click', (ev)=>{
+      if(ev.target.closest('button')) return;
+      const content = h.parentElement.querySelector('.collapse-content');
+      if(!content) return;
+      content.style.display = (content.style.display === 'none') ? 'block' : 'none';
+    });
+  });
+  // attach inline edit buttons
+  $$('button.edit-btn', contentEl).forEach(b=>{
+    b.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const pid = b.dataset.editPage, tid = b.dataset.editTab, sid = b.dataset.editSection;
+      openEditorForSection(pid, tid, sid);
+    });
+  });
+}
+
+/* -----------------------
+   Enter / return UI
+   ------------------------*/
+function enterDatabase(){
+  intro.style.display = 'none';
+  sidebarEl.classList.add('visible');
+  contentEl.classList.add('visible');
+  // show first page if none
+  if(!currentPageId){
+    const first = Object.keys(PAGES)[0];
+    if(first) loadPage(first);
+  } else loadPage(currentPageId);
+}
+function returnHome(){
+  intro.style.display = '';
+  sidebarEl.classList.remove('visible');
+  contentEl.classList.remove('visible');
+}
+
+/* -----------------------
+   Editor toggle
+   ------------------------*/
+function updateEditorToggleUI(){
+  editorToggleBtn.textContent = editMode ? 'Disable Editing' : 'Enable Editing';
+  editorToggleBtn.classList.toggle('editing', editMode);
+}
+editorToggleBtn.addEventListener('click', ()=>{
+  editMode = !editMode;
+  localStorage.setItem(EDITMODE_KEY, String(editMode));
+  updateEditorToggleUI();
+  if(currentPageId) loadPage(currentPageId);
+});
+updateEditorToggleUI();
+
+/* -----------------------
+   Editor modal functions
+   ------------------------*/
+function openEditorForSection(pageId, tabId, sectionId){
+  if(!editMode) { alert('Enable editing first (top-right button).'); return; }
+  const page = PAGES[pageId];
+  if(!page) return;
+  editorState = {
+    pageId,
+    pageCopy: deepClone(page),
+    currentTabId: tabId || page.activeTabId || (page.tabs[0] && page.tabs[0].id),
+    currentSectionId: sectionId || null,
+    originalSectionHtml: null
+  };
+  // normalize ids and fields
+  editorState.pageCopy.tabs.forEach(t=>{
+    t.id = t.id || makeId('t'); t.title = t.title || 'Untitled';
+    t.sections = Array.isArray(t.sections) ? t.sections : [];
+    t.sections.forEach(s=>{
+      s.id = s.id || makeId('s'); s.header = s.header || s.title || 'Untitled';
+      s.content = s.content || s.html || ''; if(typeof s.collapsed === 'undefined') s.collapsed = false;
+    });
+  });
+
+  editorTitle.textContent = `Edit — ${editorState.pageCopy.title}`;
+  editorMeta.textContent = `${editorState.pageCopy.category} · ${pageId}`;
+  renderEditorTabsBar();
+  renderActiveTabPane(true);
+  loadSelectedSectionIntoEditor();
+
+  editorModal.style.display = 'flex';
+  editorArea.style.display = editorState.currentSectionId ? 'flex' : 'none';
+  codeMode = false; codeArea.style.display = 'none'; editorContent.style.display = 'block';
+  setTimeout(()=> editorContent.focus(), 40);
+}
+
+/* Tabs bar rendering */
+function renderEditorTabsBar(){
+  if(!editorState) return;
+  tabsListEl.innerHTML = '';
+  const tabs = editorState.pageCopy.tabs || [];
+  if(tabs.length === 0){
+    const ph = document.createElement('div'); ph.className='meta'; ph.textContent='(no tabs)'; tabsListEl.appendChild(ph); return;
+  }
+  tabs.forEach(tab=>{
+    const btn = document.createElement('div');
+    btn.className = 'tab-btn' + (tab.id === editorState.currentTabId ? ' active' : '');
+    btn.dataset.tabId = tab.id;
+    btn.style.display = 'inline-flex';
+    btn.innerHTML = `<span class="tab-title-text">${escapeHtml(tab.title)}</span>
+      <span style="margin-left:8px;display:inline-flex;gap:6px">
+        <button class="btn ghost small rename" data-action="rename" title="Rename">✎</button>
+        <button class="btn ghost small remove" data-action="remove" title="Remove">✕</button>
+      </span>`;
+    btn.addEventListener('click', (e)=>{
+      if(e.target.closest('button')) return;
+      switchEditorTab(tab.id);
+    });
+    // rename
+    btn.querySelector('[data-action="rename"]').addEventListener('click', (ev)=>{
+      ev.stopPropagation(); initiateRenameTab(tab.id);
+    });
+    // remove
+    btn.querySelector('[data-action="remove"]').addEventListener('click', (ev)=>{
+      ev.stopPropagation(); removeTab(tab.id);
+    });
+
+    tabsListEl.appendChild(btn);
+  });
+}
+
+/* Add tab */
+addTabBtn.addEventListener('click', ()=>{
+  const title = (newTabTitleInput.value || '').trim() || 'New Tab';
+  addTab(title, true);
+  newTabTitleInput.value = '';
+});
+newTabTitleInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') addTabBtn.click(); });
+
+function addTab(title='New Tab', openAfter=true){
+  if(!editorState) return;
+  const tid = makeId('t');
+  const newTab = { id: tid, title: title, sections: [] };
+  editorState.pageCopy.tabs.push(newTab);
+  if(openAfter) editorState.currentTabId = tid;
+  renderEditorTabsBar();
+  renderActiveTabPane();
+}
+
+/* initiateRenameTab */
+function initiateRenameTab(tabId){
+  const btn = tabsListEl.querySelector(`.tab-btn[data-tab-id="${tabId}"]`);
+  if(!btn) return;
+  const titleSpan = btn.querySelector('.tab-title-text');
+  const current = titleSpan.textContent;
+  const input = document.createElement('input');
+  input.className = 'tab-edit-input';
+  input.value = current;
+  titleSpan.replaceWith(input);
+  input.focus(); input.select();
+  function finish(){
+    const newTitle = (input.value||'').trim() || 'Untitled';
+    const t = editorState.pageCopy.tabs.find(x=>x.id===tabId); if(t) t.title = newTitle;
+    renderEditorTabsBar();
+    renderActiveTabPane();
+  }
+  input.addEventListener('blur', finish);
+  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ input.blur(); } if(e.key==='Escape'){ input.value=current; input.blur(); }});
+}
+
+/* removeTab */
+function removeTab(tabId){
+  if(!editorState) return;
+  if(!confirm('Remove this tab and all its sections?')) return;
+  const idx = editorState.pageCopy.tabs.findIndex(t=>t.id===tabId);
+  if(idx===-1) return;
+  editorState.pageCopy.tabs.splice(idx,1);
+  if(editorState.currentTabId === tabId) editorState.currentTabId = editorState.pageCopy.tabs[0] ? editorState.pageCopy.tabs[0].id : null;
+  renderEditorTabsBar();
+  renderActiveTabPane();
+  loadSelectedSectionIntoEditor();
+}
+
+/* switchEditorTab with animation */
+function switchEditorTab(tabId){
+  if(!editorState || tabId === editorState.currentTabId) return;
+  const tabs = editorState.pageCopy.tabs || [];
+  const fromIndex = tabs.findIndex(t=>t.id===editorState.currentTabId);
+  const toIndex = tabs.findIndex(t=>t.id===tabId);
+  const direction = toIndex > fromIndex ? 'right' : 'left';
+  animateTabSwitch(editorState.currentTabId, tabId, direction);
+  editorState.currentTabId = tabId;
+  renderEditorTabsBar();
+}
+
+/* animateTabSwitch */
+function animateTabSwitch(fromTabId, toTabId, direction='right'){
+  const oldPane = tabsContainer.querySelector('.tab-pane.active');
+  const newPane = createTabPane(toTabId);
+  newPane.classList.add('entering');
+  tabsContainer.appendChild(newPane);
+  requestAnimationFrame(()=>{
+    newPane.classList.add('active');
+    if(oldPane){
+      oldPane.classList.add('leaving');
+      oldPane.classList.add(direction === 'left' ? 'left' : 'right');
+    }
+  });
+  setTimeout(()=>{
+    tabsContainer.querySelectorAll('.tab-pane').forEach(p => { if(p !== newPane) p.remove(); });
+    newPane.classList.remove('entering');
+    newPane.classList.add('active');
+  }, 320);
+}
+
+/* renderActiveTabPane */
+function renderActiveTabPane(forceEnter=false){
+  if(!editorState) return;
+  tabsContainer.innerHTML = '';
+  if(!editorState.currentTabId && editorState.pageCopy.tabs.length) editorState.currentTabId = editorState.pageCopy.tabs[0].id;
+  if(!editorState.currentTabId){ tabsContainer.innerHTML = '<div class="tab-pane active"><p style="padding:12px">No tabs available.</p></div>'; return; }
+  const pane = createTabPane(editorState.currentTabId);
+  if(forceEnter){
+    pane.classList.add('entering');
+    requestAnimationFrame(()=> pane.classList.add('active'));
+    setTimeout(()=> pane.classList.remove('entering'), 320);
+  } else pane.classList.add('active');
+  tabsContainer.appendChild(pane);
+}
+
+/* createTabPane */
+function createTabPane(tabId){
+  const tab = editorState.pageCopy.tabs.find(t=>t.id===tabId) || { title:'Untitled', sections:[] };
+  const pane = document.createElement('div'); pane.className='tab-pane'; pane.dataset.tabId = tabId;
+
+  const header = document.createElement('div');
+  header.style.display='flex'; header.style.justifyContent='space-between'; header.style.alignItems='center'; header.style.marginBottom='8px';
+  header.innerHTML = `<div style="font-weight:700">${escapeHtml(tab.title)}</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="addSectionBtn">+ Section</button>
+      <button class="btn ghost" id="renameTabBtn">Rename Tab</button>
+    </div>`;
+  pane.appendChild(header);
+
+  const list = document.createElement('div'); list.className='tab-sections';
+  (tab.sections || []).forEach(sec=>{
+    const secNode = createSectionEditorNode(sec, tabId);
+    list.appendChild(secNode);
+  });
+  pane.appendChild(list);
+
+  // events
+  header.querySelector('#addSectionBtn').addEventListener('click', ()=>{
+    const newSec = { id: makeId('s'), header: 'New Section', content: '<p>Edit this section</p>', collapsed:false };
+    const t = editorState.pageCopy.tabs.find(x=>x.id===tabId);
+    if(t) t.sections.push(newSec);
+    editorState.currentSectionId = newSec.id;
+    renderEditorTabsBar(); renderActiveTabPane(); loadSelectedSectionIntoEditor();
+  });
+  header.querySelector('#renameTabBtn').addEventListener('click', ()=> initiateRenameTab(tabId));
+
+  return pane;
+}
+
+/* createSectionEditorNode */
+function createSectionEditorNode(section, tabId){
+  const wrap = document.createElement('div'); wrap.className='section-editor'; wrap.dataset.sectionId = section.id;
+  const controls = document.createElement('div'); controls.className='controls'; controls.style.display='flex'; controls.style.gap='8px';
+  controls.innerHTML = `<input class="section-title-input" value="${escapeHtml(section.header||section.title||'Untitled')}" style="padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit"/>
+    <label style="font-size:.85rem">Collapsed <input type="checkbox" class="collapse-checkbox" ${section.collapsed ? 'checked' : ''} /></label>
+    <label style="font-size:.85rem">Move to:
+      <select class="move-select" style="padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit"></select>
+    </label>
+    <div style="margin-left:auto;display:flex;gap:6px">
+      <button class="btn small select-section">Edit</button>
+      <button class="btn small remove-section">Remove</button>
+    </div>`;
+  wrap.appendChild(controls);
+
+  const moveSelect = controls.querySelector('.move-select');
+  editorState.pageCopy.tabs.forEach(t=>{
+    const opt = document.createElement('option'); opt.value = t.id; opt.textContent = t.title; if(t.id === tabId) opt.selected = true; moveSelect.appendChild(opt);
+  });
+
+  const preview = document.createElement('div'); preview.className='editor-body'; preview.innerHTML = section.content || '';
+  wrap.appendChild(preview);
+
+  // handlers
+  controls.querySelector('.section-title-input').addEventListener('input', (e)=>{ section.header = e.target.value; });
+  controls.querySelector('.collapse-checkbox').addEventListener('change', (e)=>{ section.collapsed = e.target.checked; });
+  controls.querySelector('.remove-section').addEventListener('click', ()=>{
+    if(!confirm('Remove this section?')) return;
+    const parent = editorState.pageCopy.tabs.find(t=>t.sections.some(s=>s.id===section.id));
+    if(!parent) return;
+    parent.sections = parent.sections.filter(s=>s.id!==section.id);
+    if(editorState.currentSectionId === section.id) editorState.currentSectionId = null;
+    renderEditorTabsBar(); renderActiveTabPane(); loadSelectedSectionIntoEditor();
+  });
+  controls.querySelector('.select-section').addEventListener('click', ()=>{
+    editorState.currentTabId = tabId; editorState.currentSectionId = section.id;
+    renderEditorTabsBar(); renderActiveTabPane(); loadSelectedSectionIntoEditor();
+  });
+  moveSelect.addEventListener('change', (e)=>{
+    const destTabId = e.target.value;
+    if(destTabId === tabId) return;
+    const src = editorState.pageCopy.tabs.find(t=>t.sections.some(s=>s.id===section.id));
+    const dest = editorState.pageCopy.tabs.find(t=>t.id===destTabId);
+    if(!src || !dest) return;
+    src.sections = src.sections.filter(s=>s.id!==section.id);
+    dest.sections.push(section);
+    editorState.currentTabId = destTabId;
+    renderEditorTabsBar(); renderActiveTabPane(); loadSelectedSectionIntoEditor();
+  });
+
+  return wrap;
+}
+
+/* loadSelectedSectionIntoEditor */
+function loadSelectedSectionIntoEditor(){
+  if(!editorState) return;
+  let selected = null;
+  for(const t of editorState.pageCopy.tabs){
+    const s = t.sections.find(s=>s.id === editorState.currentSectionId);
+    if(s){ selected = s; break; }
+  }
+  if(!selected){
+    const tab = editorState.pageCopy.tabs.find(t=>t.id===editorState.currentTabId) || editorState.pageCopy.tabs[0];
+    if(tab && tab.sections[0]){ selected = tab.sections[0]; editorState.currentSectionId = tab.sections[0].id; }
+  }
+  if(selected){
+    editorState.originalSectionHtml = selected.content || '';
+    editorArea.style.display = 'flex';
+    editorContent.innerHTML = selected.content || '';
+    codeArea.value = selected.content || '';
+    codeMode = false; codeArea.style.display='none'; editorContent.style.display='block';
+    setTimeout(()=> editorContent.focus(), 40);
+  } else {
+    editorArea.style.display = 'none';
+  }
+}
+
+/* saveCurrentSectionFromEditor */
+function saveCurrentSectionFromEditor(){
+  if(!editorState) return;
+  let sec = null;
+  for(const t of editorState.pageCopy.tabs){
+    const s = t.sections.find(s=>s.id === editorState.currentSectionId);
+    if(s){ sec = s; break; }
+  }
+  if(!sec) return;
+  const newHtml = codeMode ? codeArea.value : editorContent.innerHTML;
+  sec.content = newHtml;
+  editorState.originalSectionHtml = newHtml;
+}
+
+/* Save page back to PAGES */
+editorSaveBtn.addEventListener('click', ()=>{
+  if(!editorState) return;
+  saveCurrentSectionFromEditor();
+  // write back
+  PAGES[editorState.pageId] = deepClone(editorState.pageCopy);
+  if(!PAGES[editorState.pageId].activeTabId || !PAGES[editorState.pageId].tabs.find(t=>t.id === PAGES[editorState.pageId].activeTabId)){
+    PAGES[editorState.pageId].activeTabId = PAGES[editorState.pageId].tabs[0] ? PAGES[editorState.pageId].tabs[0].id : null;
+  }
+  savePagesToStorage(PAGES);
+  if(currentPageId === editorState.pageId) loadPage(currentPageId);
+  alert('Page saved.');
+});
+
+/* Save & Close */
+editorSaveAndCloseBtn.addEventListener('click', ()=>{
+  editorSaveBtn.click(); closeEditorModal();
+});
+
+/* Close without save */
+editorCloseNoSaveBtn.addEventListener('click', ()=>{
+  if(confirm('Close without saving changes? All unsaved changes will be lost.')) closeEditorModal();
+});
+editorCloseBtn.addEventListener('click', closeEditorModal);
+
+function closeEditorModal(){
+  editorState = null;
+  editorModal.style.display = 'none';
+  editorArea.style.display = 'none';
+  if(currentPageId) loadPage(currentPageId);
+}
+
+/* revert */
+editorRevertBtn.addEventListener('click', ()=>{
+  if(!editorState) return;
+  if(editorState.originalSectionHtml !== null){
+    editorContent.innerHTML = editorState.originalSectionHtml;
+    codeArea.value = editorState.originalSectionHtml;
+    codeMode = false; codeArea.style.display='none'; editorContent.style.display='block';
+    alert('Reverted section content to last loaded value in modal.');
+  }
+});
+
+/* toolbar exec */
+$$('.tool-btn').forEach(btn=>{
+  btn.addEventListener('click', function(){
+    const cmd = this.dataset.cmd;
+    if(cmd === 'createLink'){
+      const url = prompt('Enter URL (include http(s)://):', 'https://');
+      if(url) document.execCommand('createLink', false, url);
+    } else {
+      document.execCommand(cmd, false, null);
+    }
+    editorContent.focus();
+  });
+});
+
+/* code mode toggle */
+codeModeBtn.addEventListener('click', ()=>{
+  codeMode = !codeMode;
+  if(codeMode){
+    codeArea.value = editorContent.innerHTML;
+    editorContent.style.display = 'none';
+    codeArea.style.display = 'block';
+    editorContent.blur();
+  } else {
+    editorContent.innerHTML = codeArea.value;
+    codeArea.style.display = 'none';
+    editorContent.style.display = 'block';
+    editorContent.focus();
+  }
+});
+
+/* keyboard esc closes modal unless in input */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape' && editorModal.style.display === 'flex'){
+    const active = document.activeElement;
+    if(active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
+    closeEditorModal();
+  }
+});
+
+/* -----------------------
+   Utility / dev helpers
+   ------------------------*/
+window.addPage = function(id, pageObj){
+  if(!id || !pageObj) return;
+  PAGES[id] = pageObj;
+  migratePagesShape(PAGES);
+  savePagesToStorage(PAGES);
+  buildSidebar(); attachSidebarDelegation();
+};
+window.dumpPages = function(){ console.log('PAGES', PAGES); return PAGES; };
+window.resetPagesToDefaults = function(){
+  if(!confirm('Reset stored pages to defaults?')) return;
+  PAGES = deepClone(DEFAULT_PAGES);
+  savePagesToStorage(PAGES);
+  migratePagesShape(PAGES); buildSidebar(); attachSidebarDelegation(); if(Object.keys(PAGES)[0]) loadPage(Object.keys(PAGES)[0]);
+  console.log('Pages reset to defaults');
+};
+
+/* -----------------------
+   Init
+   ------------------------*/
+function init(){
+  // migration & render
+  migratePagesShape(PAGES);
+  buildSidebar();
+  attachSidebarDelegation();
+
+  // open first page by default
+  const first = Object.keys(PAGES)[0];
+  if(first) loadPage(first);
+
+  // animate sidebar links
+  setTimeout(()=>{ sidebarEl.classList.add('visible'); contentEl.classList.add('visible'); sidebarEl.classList.remove('visible'); contentEl.classList.remove('visible'); }, 120);
+
+  // attach delegate for inline "Enter" button
+  enterButton.addEventListener('click', ()=>{
+    // show loading briefly, hide alert banner while loading overlay visible to avoid "bar on loading page"
+    loadingOverlay.style.display = 'flex';
+    alertBanner.classList.add('hide'); // hide alert while loading overlay visible
+    setTimeout(()=>{
+      loadingOverlay.style.display = 'none';
+      alertBanner.classList.remove('hide');
+      enterDatabase();
+    }, 200); // tiny delay for UX
+  });
+
+  // attach sidebar toggle for mobile (click outside)
+  document.addEventListener('click', (e)=>{
+    if(window.innerWidth <= 720){
+      if(e.target.closest('#sidebar') || e.target.closest('#enterButton')) return;
+      sidebarEl.classList.remove('visible');
+    }
+  });
+
+  // wire editor edit buttons from sidebar preview (delegation)
+  contentEl.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button.edit-btn');
+    if(!btn) return;
+    e.preventDefault();
+    const pid = btn.dataset.editPage, tid = btn.dataset.editTab, sid = btn.dataset.editSection;
+    openEditorForSection(pid, tid, sid);
+  });
+
+  // ensure editor toggle state applied
+  updateEditorToggleUI();
+}
+
+/* show initial intro state and then init on DOM ready */
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+<!-- Small error-overlay helper: visible only if JS errors occur -->
+<script>
+(function(){
+  function showErrorOverlay(msg, src, line, col, err) {
+    const existing = document.getElementById('__errorOverlay');
+    if(existing) existing.remove();
+    const overlay = document.createElement('div');
+    overlay.id = '__errorOverlay';
+    overlay.style.position = 'fixed';
+    overlay.style.left = '12px';
+    overlay.style.top = '12px';
+    overlay.style.right = '12px';
+    overlay.style.zIndex = 99999;
+    overlay.style.background = 'rgba(20,10,10,0.95)';
+    overlay.style.color = '#ffdddd';
+    overlay.style.padding = '12px';
+    overlay.style.border = '2px solid #ff4444';
+    overlay.style.borderRadius = '8px';
+    overlay.style.fontFamily = 'monospace';
+    overlay.style.whiteSpace = 'pre-wrap';
+    overlay.style.maxHeight = '60vh';
+    overlay.style.overflow = 'auto';
+    overlay.innerText = `JS ERROR:
+${msg}
+Source: ${src || 'n/a'}:${line || '?'}:${col || '?'}
+${err && err.stack ? '\nSTACK:\n' + err.stack : ''}`;
+    const btn = document.createElement('button');
+    btn.textContent = 'Close';
+    btn.style.display = 'block';
+    btn.style.marginTop = '8px';
+    btn.onclick = ()=>overlay.remove();
+    overlay.appendChild(btn);
+    document.body.appendChild(overlay);
+    console.error(msg, src, line, col, err);
+  }
+  window.addEventListener('error', function(e){
+    showErrorOverlay(e.message || String(e), e.filename, e.lineno, e.colno, e.error || null);
+  });
+  window.addEventListener('unhandledrejection', function(ev){
+    const reason = ev.reason && ev.reason.message ? ev.reason.message : String(ev.reason);
+    showErrorOverlay('Unhandled Promise Rejection: ' + reason, '', '', '', ev.reason || null);
+  });
+})();
+</script>
+</body>
+</html>
